@@ -14,12 +14,18 @@
     </div>
     <!-- 中部导航栏 -->
     <div class="main">
-      <van-tabs v-model="active" animated sticky offset-top="1.226667rem">
+      <van-tabs
+      v-model="active"
+      animated sticky
+      offset-top="1.226667rem"
+      >
         <van-tab
         v-for="obj in userChannelList"
         :key="obj.id"
-        :title="obj.name">
-        <ArticleList :list="articleList"></ArticleList>
+        :title="obj.name"
+        :name="obj.id"
+        >
+        <ArticleList :channelId="active"></ArticleList>
         </van-tab>
       </van-tabs>
     </div>
@@ -28,7 +34,7 @@
 
 <script>
 import ArticleList from '@/views/home/components/ArticleList.vue'
-import { getUserChannelsAPI, getAllArticleListAPI } from '@/api/index'
+import { getUserChannelsAPI } from '@/api/index'
 export default {
   name: 'HomeView',
   components: {
@@ -36,23 +42,28 @@ export default {
   },
   data () {
     return {
-      active: 2, // tab导航-激活索引
-      userChannelList: [], // 用户选择的频道列表
-      articleList: []// 文章列表
+      active: 0, // tab导航-频道ID
+      userChannelList: [] // 用户选择的频道列表
+      // articleList: []// 文章列表
     }
   },
-  methods: {},
+  methods: {
+    // tabs切换的事件 获取文章列表的数据
+    // async channelChangeFn () {
+    // const res = await getAllArticleListAPI({
+    //   channel_id: this.active, // 先默认请求推荐频道数据
+    //   timestamp: (new Date()).getTime()
+    // })
+    // this.articleList = res.data.data.results
+    // }
+  },
   async created () {
     try {
       // 获取频道列表
       const res = await getUserChannelsAPI()
       this.userChannelList = res.data.data.channels
       // 获取文章列表
-      const res2 = await getAllArticleListAPI({
-        channel_id: 0, // 先默认请求推荐频道数据
-        timestamp: (new Date()).getTime()
-      })
-      this.articleList = res2.data.data.results
+      // this.channelChangeFn()
     } catch (error) {
       console.log(error)
     }
@@ -71,9 +82,6 @@ export default {
 }
 /* tab内容距离tab导航的距离 */
 /deep/ .van-tabs__content {
-  padding-top: 44px;
-}
-.main {
   padding-top: 44px;
 }
 </style>
